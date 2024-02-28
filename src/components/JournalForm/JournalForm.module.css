@@ -14,10 +14,14 @@
     font-family: "Inter", sans-serif;  line-height: 1.5;
     border-bottom: 1px solid #323232;
     width: 100%;
+    transition: border-bottom 0.2s;
 }
 
-.input-title:focus {
+input:focus, textarea:focus {
     outline: none;
+    border-bottom: 3px solid #323232;
+    transition: border-bottom 0.2s;
+
 }
 
 .form-label {

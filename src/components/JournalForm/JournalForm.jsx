@@ -38,7 +38,7 @@ function JournalForm({ onSubmit }) {
 	return (
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
 			<div>
-				<input type="text" name="title" className={cn(styles['input-title'], {
+				<input autoComplete="off" type="text" name="title" className={cn(styles['input-title'], {
 					[styles['invalid']]: !isValid.title
 				})}/>
 			</div>
@@ -47,7 +47,7 @@ function JournalForm({ onSubmit }) {
 					<img src="/calendar.svg" alt="calendar icon" />
 					<span>Date</span>
 				</label>
-				<input type="date" name="date" id='date' className={cn(styles['input'], {
+				<input autoComplete="off" type="date" name="date" id='date' className={cn(styles['input'], {
 					[styles['invalid']]: !isValid.date
 				})}/>
 			</div>
@@ -56,10 +56,10 @@ function JournalForm({ onSubmit }) {
 					<img src="/folder.svg" alt="folder icon" />
 					<span>Tags</span>
 				</label>
-				<input type="text" name='tag' id='tag' className={cn(styles['input'])}/>
+				<input autoComplete="off" type="text" name='tag' id='tag' className={cn(styles['input'])}/>
 			</div>
 			
-			<textarea name="text" id="" cols="30" rows="10" className={cn(styles['input'], {
+			<textarea autoComplete="off" name="text" id="" cols="30" rows="10" className={cn(styles['input'], {
 				[styles['invalid']]: !isValid.text
 			})}></textarea>
 			<Button text='Save'></Button>
