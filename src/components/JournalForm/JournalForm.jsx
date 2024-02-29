@@ -1,20 +1,40 @@
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import cn from 'classnames';
 import { INITIAL_STATE, formReducer } from './JournalForm.state';
+import Input from '../Input/Input';
 
 
 function JournalForm({ onSubmit }) {
 	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
-	const { isValid, isFormReadyToSubmit, values }= formState;
+	const { isValid, isFormReadyToSubmit, values } = formState;
+	const titleRef = useRef();
+	const dateRef = useRef();
+	const textRef = useRef();
+
+	const focusError = (isValid) => {
+		switch(true) {
+		case !isValid.title: 
+			titleRef.current.focus();
+			break;
+		case !isValid.date: 
+			dateRef.current.focus();
+			break;
+		case !isValid.text: 
+			textRef.current.focus();
+			break;
+		}
+	};
+
 	useEffect(() => {
 		let timerId;
 
 		if(!isValid.date || !isValid.text || !isValid.title) {
+			focusError(isValid);
 			timerId = setTimeout(()=> {
 				dispatchForm({type: 'RESET_VALIDITY' });
-			}, 2000);
+			}, 1000);
 		}
 		return () => {
 			clearTimeout(timerId);
@@ -24,42 +44,41 @@ function JournalForm({ onSubmit }) {
 	useEffect(() => {
 		if (isFormReadyToSubmit) {
 			onSubmit(values);
+			dispatchForm({ type: 'CLEAR'});
 		}
-	}, [isFormReadyToSubmit]);
+	}, [isFormReadyToSubmit, values, onSubmit]);
+
+	const onChange = (e) => {
+		dispatchForm({ type: 'SET_VALUE', payload: {[e.target.name]: e.target.value}});
+	};
 
 	const addJournalItem = (e) => {
 		e.preventDefault();
-		const formData = new FormData(e.target);
-		const formProps = Object.fromEntries(formData);
-		dispatchForm({ type: 'SUBMIT', payload: formProps });
+		dispatchForm({ type: 'SUBMIT' });
 		
 	};
     
 	return (
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
 			<div>
-				<input autoComplete="off" type="text" name="title" className={cn(styles['input-title'], {
-					[styles['invalid']]: !isValid.title
-				})}/>
+				<Input ref={titleRef} isValid={isValid.title} placeholder='Title' autoComplete="off" onChange={onChange} type="text" name="title" value={values.title} appearence="title" />
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="date" className={styles['form-label']}>
 					<img src="/calendar.svg" alt="calendar icon" />
 					<span>Date</span>
 				</label>
-				<input autoComplete="off" type="date" name="date" id='date' className={cn(styles['input'], {
-					[styles['invalid']]: !isValid.date
-				})}/>
+				<Input ref={dateRef} isValid={isValid.date} placeholder='Date' autoComplete="off" onChange={onChange} value={values.date} type="date" name="date" id='date' />
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="tag" className={styles['form-label']}>
 					<img src="/folder.svg" alt="folder icon" />
 					<span>Tags</span>
 				</label>
-				<input autoComplete="off" type="text" name='tag' id='tag' className={cn(styles['input'])}/>
+				<Input autoComplete="off" onChange={onChange} value={values.tag} type="text" name='tag' id='tag' />
 			</div>
 			
-			<textarea autoComplete="off" name="text" id="" cols="30" rows="10" className={cn(styles['input'], {
+			<textarea ref={textRef} placeholder='Your text' autoComplete="off" onChange={onChange} value={values.text} name="text" id="" cols="30" rows="10" className={cn(styles['input'], {
 				[styles['invalid']]: !isValid.text
 			})}></textarea>
 			<Button text='Save'></Button>

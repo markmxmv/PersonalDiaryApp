@@ -6,7 +6,7 @@ import './JournalList.css';
 function JournalList({items}) {
 
 	if (items.length === 0) {
-		return <p>Записей пока нет, добавьте первую</p>;
+		return <p>Add your first memory</p>;
 	}
 	const sortItems = (a, b) => {
 		if (a.date < b.date) {
