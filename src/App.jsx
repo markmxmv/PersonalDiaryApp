@@ -6,6 +6,7 @@ import JournalList from './components/JournalList/JournalList.jsx';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton.jsx';
 import JournalForm from './components/JournalForm/JournalForm.jsx';
 import { useLocaStorage } from './hooks/use-localstorage.hook.js';
+import {  UserContextProvider } from './context/user.context.jsx';
 
 function mapItems(items) {
 	if(!items) {
@@ -23,9 +24,8 @@ function App() {
 
 	const addItem = item => {
 		setItems([...mapItems(items), {
+			...item,
 			id: items.length?Math.max(...items.map(i => i.id)) + 1:1,
-			title: item.title,
-			text: item.text,
 			date: new Date(item.date)
 		}]);
 	};
@@ -34,16 +34,18 @@ function App() {
 
 
 	return (
-		<div className='app'>
-			<LeftPanel>
-				<Header/>
-				<JournalAddButton />
-				<JournalList items={mapItems(items)}/>
-			</LeftPanel>
-			<Body>
-				<JournalForm onSubmit={addItem}></JournalForm>
-			</Body>
-		</div>
+		<UserContextProvider>
+			<div className='app'>
+				<LeftPanel>
+					<Header/>
+					<JournalAddButton />
+					<JournalList items={mapItems(items)}/>
+				</LeftPanel>
+				<Body>
+					<JournalForm onSubmit={addItem}></JournalForm>
+				</Body>
+			</div>
+		</UserContextProvider>
 	);
 }
 

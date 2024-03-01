@@ -1,9 +1,10 @@
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
-import { useEffect, useReducer, useRef } from 'react';
+import { useContext, useEffect, useReducer, useRef } from 'react';
 import cn from 'classnames';
 import { INITIAL_STATE, formReducer } from './JournalForm.state';
 import Input from '../Input/Input';
+import { UserContext } from '../../context/user.context';
 
 
 function JournalForm({ onSubmit }) {
@@ -12,6 +13,7 @@ function JournalForm({ onSubmit }) {
 	const titleRef = useRef();
 	const dateRef = useRef();
 	const textRef = useRef();
+	const { userId } = useContext(UserContext);
 
 	const focusError = (isValid) => {
 		switch(true) {
@@ -48,6 +50,10 @@ function JournalForm({ onSubmit }) {
 		}
 	}, [isFormReadyToSubmit, values, onSubmit]);
 
+	useEffect(() => {
+		dispatchForm({ type: 'SET_VALUE', payload: {userId}});
+	}, [userId]);
+
 	const onChange = (e) => {
 		dispatchForm({ type: 'SET_VALUE', payload: {[e.target.name]: e.target.value}});
 	};
@@ -77,13 +83,12 @@ function JournalForm({ onSubmit }) {
 				</label>
 				<Input autoComplete="off" onChange={onChange} value={values.tag} type="text" name='tag' id='tag' />
 			</div>
-			
+					
 			<textarea ref={textRef} placeholder='Your text' autoComplete="off" onChange={onChange} value={values.text} name="text" id="" cols="30" rows="10" className={cn(styles['input'], {
 				[styles['invalid']]: !isValid.text
 			})}></textarea>
 			<Button text='Save'></Button>
 		</form>
-	);
-}
+	);}
 
 export default JournalForm;
