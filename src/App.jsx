@@ -1,12 +1,13 @@
 import './App.css';
-import LeftPanel from './layout/LeftPanel/LeftPanel.jsx';
-import Body from './layout/Body/Body.jsx';
-import Header from './components/Header/Header.jsx';
-import JournalList from './components/JournalList/JournalList.jsx';
-import JournalAddButton from './components/JournalAddButton/JournalAddButton.jsx';
-import JournalForm from './components/JournalForm/JournalForm.jsx';
-import { useLocaStorage } from './hooks/use-localstorage.hook.js';
-import {  UserContextProvider } from './context/user.context.jsx';
+import Header from './components/Header/Header';
+import JournalAddButton from './components/JournalAddButton/JournalAddButton';
+import JournalForm from './components/JournalForm/JournalForm';
+import JournalList from './components/JournalList/JournalList';
+import Body from './layout/Body/Body';
+import LeftPanel from './layout/LeftPanel/LeftPanel';
+import { useLocaStorage } from './hooks/use-localstorage.hook';
+import { UserContextProvider } from './context/user.context';
+import { useState } from 'react';
 
 function mapItems(items) {
 	if(!items) {
@@ -19,18 +20,32 @@ function mapItems(items) {
 }
 
 function App() {
-
+	
 	const [items, setItems] = useLocaStorage('data');
+	const [selectedItem, setSelectedItem] = useState(null);
 
 	const addItem = item => {
-		setItems([...mapItems(items), {
-			...item,
-			id: items.length?Math.max(...items.map(i => i.id)) + 1:1,
-			date: new Date(item.date)
-		}]);
+		if(!item.id) {
+			setItems([...mapItems(items), {
+				...item,
+				id: items.length?Math.max(...items.map(i => i.id)) + 1:1,
+				date: new Date(item.date)
+			}]);
+		} else {
+			setItems([...mapItems(items).map(i => {
+				if( i.id === item.id) {
+					return {
+						...item
+					};
+				}
+				return i;
+			})]);
+		}
 	};
 
-
+	const deleteItem = (id) => {
+		setItems([...items.filter(i => i.id !== id)]);
+	};
 
 
 	return (
@@ -38,11 +53,11 @@ function App() {
 			<div className='app'>
 				<LeftPanel>
 					<Header/>
-					<JournalAddButton />
-					<JournalList items={mapItems(items)}/>
+					<JournalAddButton clearForm={() => setSelectedItem(null)}/>
+					<JournalList items={mapItems(items)} setItem={setSelectedItem}/>
 				</LeftPanel>
 				<Body>
-					<JournalForm onSubmit={addItem}></JournalForm>
+					<JournalForm onSubmit={addItem} onDelete={deleteItem} data={selectedItem}></JournalForm>
 				</Body>
 			</div>
 		</UserContextProvider>

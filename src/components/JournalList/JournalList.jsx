@@ -5,10 +5,10 @@ import './JournalList.css';
 import { UserContext } from '../../context/user.context';
 
 
-function JournalList({items}) {
+function JournalList({items, setItem}) {
 	const { userId } = useContext(UserContext);
 
-	if (items.length === 0) {
+	if (items.filter(i => i.userId === userId).length === 0) {
 		return <p>Add your first memory</p>;
 	}
 	const sortItems = (a, b) => {
@@ -23,8 +23,9 @@ function JournalList({items}) {
 		<>
 			{items
 				.filter(el => el.userId === userId)
-				.sort(sortItems).map(el => (
-					<CardButton key={el.id}>
+				.sort(sortItems)
+				.map(el => (
+					<CardButton key={el.id} onClick={() => setItem(el)}>
 						<JournalItem 
 							title={el.title}
 							text={el.text}

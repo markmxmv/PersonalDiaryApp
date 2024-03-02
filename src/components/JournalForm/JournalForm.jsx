@@ -7,7 +7,7 @@ import Input from '../Input/Input';
 import { UserContext } from '../../context/user.context';
 
 
-function JournalForm({ onSubmit }) {
+function JournalForm({ onSubmit, data, onDelete }) {
 	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
 	const { isValid, isFormReadyToSubmit, values } = formState;
 	const titleRef = useRef();
@@ -30,6 +30,14 @@ function JournalForm({ onSubmit }) {
 	};
 
 	useEffect(() => {
+		if(!data) {
+			dispatchForm({ type: 'CLEAR'});
+			dispatchForm({ type: 'SET_VALUE', payload: {userId}});
+		}
+		dispatchForm({ type: 'SET_VALUE', payload: {...data}});
+	}, [data]);
+
+	useEffect(() => {
 		let timerId;
 
 		if(!isValid.date || !isValid.text || !isValid.title) {
@@ -47,6 +55,8 @@ function JournalForm({ onSubmit }) {
 		if (isFormReadyToSubmit) {
 			onSubmit(values);
 			dispatchForm({ type: 'CLEAR'});
+			dispatchForm({ type: 'SET_VALUE', payload: {userId}});
+
 		}
 	}, [isFormReadyToSubmit, values, onSubmit]);
 
@@ -63,18 +73,27 @@ function JournalForm({ onSubmit }) {
 		dispatchForm({ type: 'SUBMIT' });
 		
 	};
+
+	const deleteJournalItem = () => {
+		onDelete(data.id);
+		dispatchForm({ type: 'CLEAR'});
+		dispatchForm({ type: 'SET_VALUE', payload: {userId}});
+	};
     
 	return (
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>
-			<div>
+			<div className={styles['form-row']}>
 				<Input ref={titleRef} isValid={isValid.title} placeholder='Title' autoComplete="off" onChange={onChange} type="text" name="title" value={values.title} appearence="title" />
+				{ data?.id && <button className={styles.delete} type='button' onClick={() => deleteJournalItem()}>
+					<img src="/delete.svg" alt="delete button" />
+				</button>}
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="date" className={styles['form-label']}>
 					<img src="/calendar.svg" alt="calendar icon" />
 					<span>Date</span>
 				</label>
-				<Input ref={dateRef} isValid={isValid.date} placeholder='Date' autoComplete="off" onChange={onChange} value={values.date} type="date" name="date" id='date' />
+				<Input ref={dateRef} isValid={isValid.date} placeholder='Date' autoComplete="off" onChange={onChange} value={values.date ? new Date(values.date).toISOString().slice(0, 10) : ''} type="date" name="date" id='date' />
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="tag" className={styles['form-label']}>

@@ -55,3 +55,17 @@ input:focus, textarea:focus {
     border-bottom: 1px solid rgb(210, 0, 0);
     transition: border-bottom 0.2s;
 }
+
+.delete {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    height: 30px;
+    width: 30px;
+}
+
+.delete:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
